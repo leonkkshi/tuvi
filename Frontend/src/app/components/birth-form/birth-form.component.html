@@ -1,0 +1,163 @@
+<div class="birth-form">
+  <div class="form-header">
+    <h2>NHẬP THÔNG TIN SINH</h2>
+    <p class="subtitle">Vui lòng nhập đầy đủ thông tin để xem lá số Tử Vi</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #birthForm="ngForm">
+    <!-- Họ và tên -->
+    <div class="form-group">
+      <label for="fullName">
+        <i class="icon">👤</i> Họ và tên:
+      </label>
+      <input 
+        type="text" 
+        id="fullName" 
+        name="fullName" 
+        [(ngModel)]="fullName" 
+        placeholder="Nhập họ và tên"
+        [class.error]="errors['fullName']">
+      <span class="error-message" *ngIf="errors['fullName']">{{ errors['fullName'] }}</span>
+    </div>
+
+    <!-- Giới tính và loại lịch -->
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Giới tính:</label>
+        <div class="radio-group">
+          <label class="radio-label" [class.selected]="birthInfo.isMale">
+            <input type="radio" name="gender" [value]="true" [(ngModel)]="birthInfo.isMale">
+            <span>👨 Nam</span>
+          </label>
+          <label class="radio-label" [class.selected]="!birthInfo.isMale">
+            <input type="radio" name="gender" [value]="false" [(ngModel)]="birthInfo.isMale">
+            <span>👩 Nữ</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group half">
+        <label>Loại lịch:</label>
+        <div class="radio-group">
+          <label class="radio-label" [class.selected]="birthInfo.isLunar">
+            <input type="radio" name="calendarType" [value]="true" [(ngModel)]="birthInfo.isLunar" (change)="updateDaysInMonth()">
+            <span>🌙 Âm lịch</span>
+          </label>
+          <label class="radio-label" [class.selected]="!birthInfo.isLunar">
+            <input type="radio" name="calendarType" [value]="false" [(ngModel)]="birthInfo.isLunar" (change)="updateDaysInMonth()">
+            <span>☀️ Dương lịch</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ngày tháng năm sinh -->
+    <div class="form-section">
+      <h3>📅 Ngày Sinh</h3>
+      <div class="form-row">
+        <div class="form-group third">
+          <label for="year">Năm:</label>
+          <select 
+            id="year" 
+            name="year" 
+            [(ngModel)]="birthInfo.year"
+            (change)="updateDaysInMonth()"
+            [class.error]="errors['year']">
+            <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['year']">{{ errors['year'] }}</span>
+        </div>
+
+        <div class="form-group third">
+          <label for="month">Tháng:</label>
+          <select 
+            id="month" 
+            name="month" 
+            [(ngModel)]="birthInfo.month"
+            (change)="onMonthChange()"
+            [class.error]="errors['month']">
+            <option *ngFor="let m of months" [value]="m">Tháng {{ m }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['month']">{{ errors['month'] }}</span>
+        </div>
+
+        <div class="form-group third">
+          <label for="day">Ngày:</label>
+          <select 
+            id="day" 
+            name="day" 
+            [(ngModel)]="birthInfo.day"
+            [class.error]="errors['day']">
+            <option *ngFor="let d of days" [value]="d">Ngày {{ d }}</option>
+          </select>
+          <span class="error-message" *ngIf="errors['day']">{{ errors['day'] }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Giờ sinh -->
+    <div class="form-section">
+      <h3>⏰ Giờ Sinh</h3>
+      <div class="form-group">
+        <label for="hourBranch">Chọn giờ (Địa chi):</label>
+        <select 
+          id="hourBranch" 
+          name="hourBranch" 
+          [(ngModel)]="selectedHourBranch"
+          (change)="onHourBranchChange()"
+          class="select-large">
+          <option *ngFor="let branch of hourBranches" [value]="branch.name">
+            {{ branch.name }} ({{ branch.displayTime }})
+          </option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half">
+          <label for="hour">Hoặc nhập giờ cụ thể:</label>
+          <input 
+            type="number" 
+            id="hour" 
+            name="hour" 
+            [(ngModel)]="birthInfo.hour" 
+            min="0" 
+            max="23"
+            placeholder="Giờ (0-23)">
+        </div>
+
+        <div class="form-group half">
+          <label for="minute">Phút:</label>
+          <input 
+            type="number" 
+            id="minute" 
+            name="minute" 
+            [(ngModel)]="birthInfo.minute" 
+            min="0" 
+            max="59"
+            placeholder="Phút (0-59)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Năm xem -->
+    <div class="form-group">
+      <label for="viewYear">
+        <i class="icon">📆</i> Năm xem lá số:
+      </label>
+      <select 
+        id="viewYear" 
+        name="viewYear" 
+        [(ngModel)]="viewYear"
+        [class.error]="errors['viewYear']">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+      <span class="error-message" *ngIf="errors['viewYear']">{{ errors['viewYear'] }}</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="form-actions">
+      <button type="button" class="btn-clear" (click)="clearForm()">🔄 Xóa</button>
+      <button type="submit" class="btn-submit">✨ An Sao Tử Vi</button>
+    </div>
+  </form>
+</div>

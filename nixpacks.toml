@@ -1,0 +1,16 @@
+# Railway Nixpacks configuration for .NET
+[phases.setup]
+nixPkgs = ['dotnet-sdk_9']
+
+[phases.build]
+cmds = [
+  'cd Backend',
+  'dotnet restore',
+  'dotnet publish -c Release -o out'
+]
+
+[phases.deploy]
+cmds = ['dotnet Backend/out/Backend.dll']
+
+[start]
+cmd = 'dotnet Backend/out/Backend.dll'

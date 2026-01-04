@@ -1,0 +1,43 @@
+services:
+  # Backend API (.NET)
+  - type: web
+    name: tuvi-backend
+    env: docker
+    dockerfilePath: ./Backend/Dockerfile
+    region: singapore
+    plan: free
+    healthCheckPath: /api/tuvi/health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: AI__Provider
+        value: Gemini
+      - key: Gemini__ApiKey
+        sync: false # Set này trong Render Dashboard
+      - key: AI__MaxConcurrentRequests
+        value: 3
+    
+  # Frontend (Angular Static Site)
+  - type: web
+    name: tuvi-frontend
+    env: static
+    buildCommand: cd Frontend && npm ci --legacy-peer-deps && npm run build -- --configuration production
+    staticPublishPath: ./Frontend/dist/frontend/browser
+    region: singapore
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0

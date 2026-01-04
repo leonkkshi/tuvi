@@ -1,0 +1,144 @@
+import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ChartRequest } from '../../models/tu-vi.models';
+
+@Component({
+  selector: 'app-birth-form',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './birth-form.component.html',
+  styleUrl: './birth-form.component.css'
+})
+export class BirthFormComponent {
+  @Output() chartGenerated = new EventEmitter<ChartRequest>();
+
+  birthInfo: ChartRequest = {
+    year: 2005,
+    month: 8,
+    day: 17,
+    hour: 14,
+    minute: 30,
+    isMale: true,
+    isLunar: false
+  };
+
+  fullName: string = 'Nguyễn Văn Tuấn';
+  viewYear: number = 2026;
+  selectedHourBranch: string = 'Mùi'; // Giờ 14:30
+  errors: { [key: string]: string } = {};
+
+  // Danh sách giờ địa chi
+  hourBranches = [
+    { name: 'Tý', startHour: 23, endHour: 1, displayTime: '23:00 - 01:00' },
+    { name: 'Sửu', startHour: 1, endHour: 3, displayTime: '01:00 - 03:00' },
+    { name: 'Dần', startHour: 3, endHour: 5, displayTime: '03:00 - 05:00' },
+    { name: 'Mão', startHour: 5, endHour: 7, displayTime: '05:00 - 07:00' },
+    { name: 'Thìn', startHour: 7, endHour: 9, displayTime: '07:00 - 09:00' },
+    { name: 'Tỵ', startHour: 9, endHour: 11, displayTime: '09:00 - 11:00' },
+    { name: 'Ngọ', startHour: 11, endHour: 13, displayTime: '11:00 - 13:00' },
+    { name: 'Mùi', startHour: 13, endHour: 15, displayTime: '13:00 - 15:00' },
+    { name: 'Thân', startHour: 15, endHour: 17, displayTime: '15:00 - 17:00' },
+    { name: 'Dậu', startHour: 17, endHour: 19, displayTime: '17:00 - 19:00' },
+    { name: 'Tuất', startHour: 19, endHour: 21, displayTime: '19:00 - 21:00' },
+    { name: 'Hợi', startHour: 21, endHour: 23, displayTime: '21:00 - 23:00' }
+  ];
+
+  // Danh sách năm gần đây
+  years: number[] = [];
+  months: number[] = Array.from({ length: 12 }, (_, i) => i + 1);
+  days: number[] = Array.from({ length: 30 }, (_, i) => i + 1);
+
+  constructor() {
+    // Tạo danh sách năm từ 1920 đến hiện tại + 10 năm
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear + 10; year >= 1920; year--) {
+      this.years.push(year);
+    }
+    this.updateDaysInMonth();
+  }
+
+  onHourBranchChange() {
+    const branch = this.hourBranches.find(b => b.name === this.selectedHourBranch);
+    if (branch) {
+      // Lấy giờ giữa khoảng
+      this.birthInfo.hour = branch.startHour === 23 ? 0 : branch.startHour + 1;
+      this.birthInfo.minute = 0;
+    }
+  }
+
+  onMonthChange() {
+    this.updateDaysInMonth();
+  }
+
+  updateDaysInMonth() {
+    const daysInMonth = this.getDaysInMonth(this.birthInfo.year, this.birthInfo.month, this.birthInfo.isLunar);
+    this.days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    if (this.birthInfo.day > daysInMonth) {
+      this.birthInfo.day = daysInMonth;
+    }
+  }
+
+  getDaysInMonth(year: number, month: number, isLunar: boolean): number {
+    if (isLunar) {
+      // Âm lịch: tháng 29 hoặc 30 ngày
+      return 30;
+    } else {
+      // Dương lịch
+      return new Date(year, month, 0).getDate();
+    }
+  }
+
+  validateForm(): boolean {
+    this.errors = {};
+    let isValid = true;
+
+    if (!this.fullName || this.fullName.trim().length < 2) {
+      this.errors['fullName'] = 'Vui lòng nhập họ tên (ít nhất 2 ký tự)';
+      isValid = false;
+    }
+
+    if (!this.birthInfo.year || this.birthInfo.year < 1900 || this.birthInfo.year > 2100) {
+      this.errors['year'] = 'Năm sinh không hợp lệ';
+      isValid = false;
+    }
+
+    if (!this.birthInfo.month || this.birthInfo.month < 1 || this.birthInfo.month > 12) {
+      this.errors['month'] = 'Tháng không hợp lệ';
+      isValid = false;
+    }
+
+    if (!this.birthInfo.day || this.birthInfo.day < 1 || this.birthInfo.day > 31) {
+      this.errors['day'] = 'Ngày không hợp lệ';
+      isValid = false;
+    }
+
+    if (!this.viewYear || this.viewYear < 1900 || this.viewYear > 2100) {
+      this.errors['viewYear'] = 'Năm xem không hợp lệ';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  onSubmit() {
+    if (this.validateForm()) {
+      this.chartGenerated.emit(this.birthInfo);
+    }
+  }
+
+  clearForm() {
+    this.birthInfo = {
+      year: 2005,
+      month: 1,
+      day: 1,
+      hour: 0,
+      minute: 0,
+      isMale: true,
+      isLunar: true
+    };
+    this.fullName = '';
+    this.viewYear = new Date().getFullYear();
+    this.selectedHourBranch = 'Tý';
+    this.errors = {};
+  }
+}

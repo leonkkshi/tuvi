@@ -1,0 +1,22 @@
+<div class="app-container">
+  <header>
+    <h1>{{ title }}</h1>
+  </header>
+
+  <main>
+    <div class="content">
+      <app-birth-form (chartGenerated)="onChartGenerated($event)"></app-birth-form>
+      
+      <div *ngIf="loading" class="loading">
+        <p>Đang tạo lá số...</p>
+      </div>
+
+      <div *ngIf="error" class="error">
+        <p>{{ error }}</p>
+      </div>
+
+      <app-tu-vi-chart [chart]="chart"></app-tu-vi-chart>
+    </div>
+  </main>
+</div>
+<router-outlet />
