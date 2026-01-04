@@ -1,0 +1,18 @@
+@Backend_HostAddress = http://localhost:5015
+
+GET {{Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+# Test lunar conversion: 20/09/2005 should convert to 16/08/2005
+GET {{Backend_HostAddress}}/api/tuvi/test-lunar/20/9/2005
+Accept: application/json
+
+###
+
+# Test lunar conversion: 01/01/2000
+GET {{Backend_HostAddress}}/api/tuvi/test-lunar/1/1/2000
+Accept: application/json
+
+###
